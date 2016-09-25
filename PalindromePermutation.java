@@ -1,4 +1,4 @@
-package leetcodePractice;
+    package leetcodePractice;
 
 /*
 Difficulty: Easy
@@ -8,30 +8,26 @@ For example,
 "code" -> False, "aab" -> True, "carerac" -> True.
  */
 
-public class PalindromePermutation {
-	public boolean canPermutePalindrome(String s) {
+public class Solution {
+    public boolean canPermutePalindrome(String s) {
         HashMap<Character, Integer> map = new HashMap<Character, Integer>();
-        if (s == null || s.length() < 2)
-            return true;
-        for (int i = 0; i<s.length(); i++) {
-            if (map.containsKey(s.charAt(i)))
-                map.put(s.charAt(i), map.get(s.charAt(i)) + 1);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (map.containsKey(c))
+                map.put(c, map.get(c) + 1);
             else
-                map.put(s.charAt(i), 1);
+                map.put(c, 1);
         }
-        if (s.length() % 2 == 0) {
-            for (int cnt : map.values())
-                if (cnt % 2 != 0)
-                    return false;
-        } else {
-            boolean flag = false;
-            for (int cnt : map.values()) {
-                if (cnt % 2 != 0 && !flag)
-                    flag = true;
-                else if (cnt % 2 != 0 && flag)
-                    return false;
+        int count = 0;
+        for (int i : map.values()) {
+            if (i % 2 != 0) {
+                count++;
             }
         }
-        return true;
+        if (count == 0)
+            return true;
+        else if (count == 1)
+            return s.length() % 2 != 0;
+        return false;
     }
 }
