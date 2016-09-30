@@ -1,0 +1,179 @@
+/*
+Find Median from Data Stream
+
+Median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value. So the median is the mean of the two middle value.
+
+Examples: 
+[2,3,4] , the median is 3
+
+[2,3], the median is (2 + 3) / 2 = 2.5
+
+Design a data structure that supports the following two operations:
+
+void addNum(int num) - Add a integer number from the data stream to the data structure.
+double findMedian() - Return the median of all elements so far.
+For example:
+add(1)
+add(2)
+findMedian() -> 1.5
+add(3) 
+findMedian() -> 2
+
+*/
+
+public class MedianFinder {
+    List<Integer> minHeap, maxHeap;
+    
+    public MedianFinder() {
+        minHeap = new ArrayList<Integer>();
+        maxHeap = new ArrayList<Integer>();
+    }
+    
+    private int getLeftChild(int i) {
+        return (2 * i) + 1;
+    }
+    
+    private int getRightChild(int i) {
+        return (2 * i) + 2;
+    }
+    
+    private int getParent(int i) {
+        return (i - 1) / 2;
+    }
+    
+    private void swap(boolean isMinHeap, int i, int j) {
+        int temp;
+        if (isMinHeap) {
+            if (i >= minHeap.size() || j >= minHeap.size())
+                return;
+            temp = minHeap.get(i);
+            minHeap.set(i, minHeap.get(j));
+            minHeap.set(j, temp);
+        } else {
+            if (i >= maxHeap.size() || j >= maxHeap.size())
+                return;
+            temp = maxHeap.get(i);
+            maxHeap.set(i, maxHeap.get(j));
+            maxHeap.set(j, temp);
+        }
+    }
+    
+    private void insertMinHeap(int val) {
+        minHeap.add(val);
+        int curr = minHeap.size() - 1;
+        while (curr > 0) {
+            int parent = getParent(curr);
+            if (minHeap.get(parent) < minHeap.get(curr))
+                break;
+            swap(true, parent, curr);
+            curr = parent;
+        }
+    }
+    
+    private void insertMaxHeap(int val) {
+        maxHeap.add(val);
+        int curr = maxHeap.size() - 1;
+        while (curr > 0) {
+            int parent = getParent(curr);
+            if (maxHeap.get(parent) > maxHeap.get(curr))
+                break;
+            swap(false, parent, curr);
+            curr = parent;
+        }
+    }
+    
+    private void minHeapify(int i) {
+        int smallIndex = i;
+        int left = getLeftChild(i);
+        int right = getRightChild(i);
+        if (left < minHeap.size() && minHeap.get(i) > minHeap.get(left))
+            smallIndex = left;
+        if (right < minHeap.size() && minHeap.get(smallIndex) > minHeap.get(right))
+            smallIndex = right;
+        if (smallIndex != i) {
+            swap(true, i, smallIndex);
+            minHeapify(smallIndex);
+        }
+    }
+    
+    private void deleteMinHeap() {
+        int size = minHeap.size();
+        if (size <= 0)
+            return;
+        if (size <= 2) {
+            minHeap.remove(0);
+            return;
+        }
+        minHeap.set(0, minHeap.get(size - 1));
+        minHeap.remove(size - 1);
+        minHeapify(0);
+    }
+    
+    private void maxHeapify(int i) {
+        int bigIndex = i;
+        int left = getLeftChild(i);
+        int right = getRightChild(i);
+        if (left < maxHeap.size() && maxHeap.get(i) < maxHeap.get(left))
+            bigIndex = left;
+        if (right < maxHeap.size() && maxHeap.get(bigIndex) < maxHeap.get(right))
+            bigIndex = right;
+        if (bigIndex != i) {
+            swap(false, i, bigIndex);
+            maxHeapify(bigIndex);
+        }
+    }
+    
+    private void deleteMaxHeap() {
+        int size = maxHeap.size();
+        if (size <= 0)
+            return;
+        if (size <= 2) {
+            maxHeap.remove(0);
+            return;
+        }
+        maxHeap.set(0, maxHeap.get(size - 1));
+        maxHeap.remove(size - 1);
+        maxHeapify(0);
+    }
+
+    // Adds a number into the data structure.
+    public void addNum(int num) {
+        if (minHeap.size() == 0 && maxHeap.size() == 0) {
+            maxHeap.add(num);
+            return;
+        }
+        int max = maxHeap.get(0);
+        if (max > num)
+            insertMaxHeap(num);
+        else
+            insertMinHeap(num);
+        int minSize = minHeap.size();
+        int maxSize = maxHeap.size();
+        if (minSize == maxSize)
+            return;
+        if ((maxSize - minSize) > 1) {
+            int temp = maxHeap.get(0);
+            deleteMaxHeap();
+            insertMinHeap(temp);
+        } else if ((minSize - maxSize) > 1) {
+            int temp = minHeap.get(0);
+            deleteMinHeap();
+            insertMaxHeap(temp);
+        }
+    }
+
+    // Returns the median of current data stream
+    public double findMedian() {
+        if (minHeap.size() == maxHeap.size()) {
+            return (minHeap.get(0) + maxHeap.get(0)) * 0.5;
+        } else if (minHeap.size() > maxHeap.size()) {
+            return minHeap.get(0);
+        } else
+            return maxHeap.get(0);
+    }
+}
+
+// Your MedianFinder object will be instantiated and called as such:
+// MedianFinder mf = new MedianFinder();
+// mf.addNum(1);
+// mf.findMedian();
