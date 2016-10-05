@@ -1,0 +1,40 @@
+/*
+Range Sum Query - Immutable
+
+Given an integer array nums, find the sum of the elements between indices i and j (i = j), inclusive.
+
+Example:
+Given nums = [-2, 0, 3, -5, 2, -1]
+
+sumRange(0, 2) -> 1
+sumRange(2, 5) -> -1
+sumRange(0, 5) -> -3
+Note:
+You may assume that the array does not change.
+There are many calls to sumRange function.
+
+*/
+
+public class NumArray {
+    int[] result;
+
+    // Create the output array with one extra element (0th element = 0)
+    // By doing so, the need of an extra if else expression while
+    // returning the result can be eliminated.
+    public NumArray(int[] nums) {
+        result = new int[nums.length + 1];
+        for (int i = 0; i < nums.length; i++) {
+            result[i + 1] = result[i] + nums[i];
+        }
+    }
+
+    public int sumRange(int i, int j) {
+        return (result[j + 1] - result[i]);
+    }
+}
+
+
+// Your NumArray object will be instantiated and called as such:
+// NumArray numArray = new NumArray(nums);
+// numArray.sumRange(0, 1);
+// numArray.sumRange(1, 2);
