@@ -1,0 +1,60 @@
+/*
+Course Schedule
+
+There are a total of n courses you have to take, labeled from 0 to n - 1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?
+
+For example:
+
+2, [[1,0]]
+There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
+
+2, [[1,0],[0,1]]
+There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+Note:
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices.
+*/
+
+public class Solution {
+    public boolean cycle = false;
+    
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> graph = new ArrayList<List<Integer>>();
+        constructGraph(numCourses, graph, prerequisites);
+        
+        int[] color = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            if (color[i] == 0)
+                DFS(graph, i, color);
+        }
+        
+        return !cycle;
+    }
+    
+    private void constructGraph(int numCourses, List<List<Integer>> graph, int[][] prerequisites) {
+        for (int i = 0; i < numCourses; i++) {
+            List<Integer> t = new ArrayList<Integer>();
+            graph.add(t);
+        }
+        
+        for (int[] cc : prerequisites) {
+            graph.get(cc[1]).add(cc[0]);
+        }
+    }
+    
+    public void DFS(List<List<Integer>> graph, int vertex, int[] color) {
+        color[vertex] = 1;
+        for (int v : graph.get(vertex)) {
+            if (color[v] == 0)
+                DFS(graph, v, color);
+            else if (color[v] == 1) {
+                cycle = true;
+            }
+        }
+        color[vertex] = 2;
+    }
+}
